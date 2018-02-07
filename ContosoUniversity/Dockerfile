@@ -1,8 +1,8 @@
-FROM microsoft/aspnetcore:2.0-nanoserver-sac2016 AS base
+FROM microsoft/aspnetcore:2.0-nanoserver-1709 AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM microsoft/aspnetcore-build:2.0-nanoserver-sac2016 AS build
+FROM microsoft/aspnetcore-build:2.0-nanoserver-1709 AS build
 WORKDIR /src
 COPY ContosoUniversity/ContosoUniversity.csproj ContosoUniversity/
 WORKDIR /src/ContosoUniversity

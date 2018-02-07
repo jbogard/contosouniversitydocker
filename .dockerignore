@@ -10,3 +10,5 @@ docker-compose.*.yml
 */obj
 !obj/Docker/publish/*
 !obj/Docker/empty/
+ci.ps1
+ci.Dockerfile
