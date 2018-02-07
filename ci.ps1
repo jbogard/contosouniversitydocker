@@ -22,7 +22,7 @@ function Exec
     }
 }
 
-exec { & docker-compose -f .\docker-compose.ci.yml -p contosouniversitydotnetcore-ci up -d --build --remove-orphans --force-recreate }
+exec { & cmd /c docker-compose -f .\docker-compose.ci.yml -p contosouniversitydotnetcore-ci up -d --build --remove-orphans --force-recreate 2`>`&1 }
 
 exec { & docker ps }
 
