@@ -5,8 +5,8 @@ services:
     image: contosouniversity
     build:
       context: .
-      dockerfile: ContosoUniversity\Dockerfile
+      dockerfile: ContosoUniversity/Dockerfile
     depends_on:
       - db
   db:
-    image: microsoft/mssql-server-windows-developer
+    image: microsoft/mssql-server-linux
