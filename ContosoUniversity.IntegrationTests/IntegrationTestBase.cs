@@ -1,31 +1,37 @@
-﻿using System.Threading.Tasks;
-using Nito.AsyncEx;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ContosoUniversity.IntegrationTests
 {
     public abstract class IntegrationTestBase : IAsyncLifetime
     {
-        private static readonly AsyncLock Mutex = new AsyncLock();
-
-        private static bool _initialized;
+        private static readonly AsyncLazy<bool> Mutex = new AsyncLazy<bool>(() => Initialize());
 
         public virtual async Task InitializeAsync()
         {
-            if (_initialized)
-                return;
-
-            using (await Mutex.LockAsync())
-            {
-                if (_initialized)
-                    return;
-                
-                //await SliceFixture.ResetCheckpoint();
-
-                _initialized = true;
-            }
+            await Mutex;
         }
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
+
+        private static async Task<bool> Initialize() 
+        {
+            await SliceFixture.ResetCheckpoint();
+
+            return true;
+        }
+    }
+
+    class AsyncLazy<T> : Lazy<Task<T>> 
+    { 
+        public AsyncLazy(Func<T> valueFactory) : 
+            base(() => Task.Factory.StartNew(valueFactory)) { }
+
+        public AsyncLazy(Func<Task<T>> taskFactory) : 
+            base(() => Task.Factory.StartNew(() => taskFactory()).Unwrap()) { } 
+
+        public TaskAwaiter<T> GetAwaiter() => Value.GetAwaiter();
     }
 }

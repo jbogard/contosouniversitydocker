@@ -1,4 +1,4 @@
-FROM microsoft/aspnetcore-build:2.0.5-2.1.4-nanoserver-sac2016
+FROM microsoft/aspnetcore-build:2.0-jessie
 WORKDIR /src
 COPY ContosoUniversity.CI.sln ./
 COPY ContosoUniversity/ContosoUniversity.csproj ContosoUniversity/
@@ -6,4 +6,5 @@ COPY ContosoUniversity.IntegrationTests/ContosoUniversity.IntegrationTests.cspro
 RUN dotnet restore 
 COPY . .
 
-ENTRYPOINT ["powershell"]
+#ENTRYPOINT ["powershell"]
+ENTRYPOINT ["/bin/bash"]
