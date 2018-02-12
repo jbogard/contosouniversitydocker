@@ -2,13 +2,15 @@ version: '3'
 
 services:
   ci:
-    build:
-      context: .
-      dockerfile: ci.Dockerfile
+    image: microsoft/aspnetcore-build:2.0.5-2.1.4-nanoserver-sac2016
+    volumes:
+      - .\:c:\src
+    working_dir: \src
     environment:
       - "ConnectionStrings:DefaultConnection=Server=test-db;Database=contosouniversity-test;User Id=sa;Password=Pass@word"
     depends_on:
       - test-db
+    entrypoint: powershell
   test-db:
     image: microsoft/mssql-server-windows-developer
     environment:
