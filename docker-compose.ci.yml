@@ -12,7 +12,7 @@ services:
       - test-db
     entrypoint: powershell
   test-db:
-    image: microsoft/mssql-server-windows-developer
+    image: jbogard.azurecr.io/mssql-server-windows-developer
     environment:
       - sa_password=Pass@word
       - ACCEPT_EULA=Y
