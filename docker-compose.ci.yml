@@ -2,7 +2,7 @@ version: '3'
 
 services:
   ci:
-    image: microsoft/aspnetcore-build:2.0.5-2.1.4-nanoserver-sac2016
+    image: jbogard.azurecr.io/aspnetcore-build:2.0.5-2.1.4-nanoserver-1709
     volumes:
       - .\:c:\src
     working_dir: \src
@@ -10,7 +10,7 @@ services:
       - "ConnectionStrings:DefaultConnection=Server=test-db;Database=contosouniversity-test;User Id=sa;Password=Pass@word"
     depends_on:
       - test-db
-    entrypoint: powershell
+    entrypoint: pwsh
   test-db:
     image: jbogard.azurecr.io/mssql-server-windows-developer
     environment:
