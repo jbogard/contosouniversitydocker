@@ -1,0 +1,16 @@
+queue:
+  name: Hosted VS2017
+steps:
+- task: DockerCompose@0
+  inputs:
+    azureSubscription: 'Windows Azure MSDN - Visual Studio Ultimate (fcfd0830-6126-417f-91fe-08d99d1a09f5)'
+    azureContainerRegistry: '{"loginServer":"jbogard.azurecr.io", "id" : "/subscriptions/fcfd0830-6126-417f-91fe-08d99d1a09f5/resourceGroups/ACR/providers/Microsoft.ContainerRegistry/registries/jbogard"}'
+    dockerComposeFile: '**/docker-compose.ci.yml'
+    dockerComposeCommand: 'up -d --build --remove-orphans --force-recreate'
+
+- task: DockerCompose@0
+  inputs:
+    azureSubscription: 'Windows Azure MSDN - Visual Studio Ultimate (fcfd0830-6126-417f-91fe-08d99d1a09f5)'
+    azureContainerRegistry: '{"loginServer":"jbogard.azurecr.io", "id" : "/subscriptions/fcfd0830-6126-417f-91fe-08d99d1a09f5/resourceGroups/ACR/providers/Microsoft.ContainerRegistry/registries/jbogard"}'
+    dockerComposeFile: '**/docker-compose.ci.yml'
+    dockerComposeCommand: 'run ci .\Build.ps1'
