@@ -24,25 +24,13 @@ function Exec
 
 exec { & dotnet --info }
 
-#exec { & dotnet build ContosoUniversity.CI.sln -c Release --version-suffix=$buildSuffix }
-exec { & dotnet build ContosoUniversity.CI.sln -c Release }
+exec { & dotnet build ContosoUniversity.sln -c Release }
 
 Push-Location -Path .\ContosoUniversity.IntegrationTests
 
 try {
-	exec { & dotnet xunit -configuration Release -nobuild --fx-version 2.0.5 }
+	exec { & dotnet test -c Release --no-build  }
 }
 finally {
 	Pop-Location
 }
-
-#exec { & dotnet publish ContosoUniversity --output .\..\publish --configuration Release }
-
-#$octo_revision = @{ $true = $env:APPVEYOR_BUILD_NUMBER; $false = "0" }[$env:APPVEYOR_BUILD_NUMBER -ne $NULL];
-#$octo_version = "1.0.$octo_revision"
-
-#exec { & .\tools\Octo.exe pack --id ContosoUniversity --version $octo_version --basePath publish --outFolder artifacts }
-
-
-
-
