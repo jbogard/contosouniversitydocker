@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -25,13 +26,13 @@ namespace ContosoUniversity.Features.Students
             public DateTime EnrollmentDate { get; set; }
         }
 
-        public class QueryHandler : AsyncRequestHandler<Query, Command>
+        public class QueryHandler : IRequestHandler<Query, Command>
         {
             private readonly SchoolContext _db;
 
             public QueryHandler(SchoolContext db) => _db = db;
 
-            protected override async Task<Command> HandleCore(Query message) => await _db
+            public async Task<Command> Handle(Query message, CancellationToken token) => await _db
                 .Students
                 .Where(s => s.Id == message.Id)
                 .ProjectTo<Command>()
@@ -44,7 +45,7 @@ namespace ContosoUniversity.Features.Students
 
             public CommandHandler(SchoolContext db) => _db = db;
 
-            protected override async Task HandleCore(Command message) 
+            protected override async Task Handle(Command message, CancellationToken token) 
                 => _db.Students.Remove(await _db.Students.FindAsync(message.ID));
         }
 

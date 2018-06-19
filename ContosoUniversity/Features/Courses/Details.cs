@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -33,13 +34,13 @@ namespace ContosoUniversity.Features.Courses
             public string DepartmentName { get; set; }
         }
 
-        public class Handler : AsyncRequestHandler<Query, Model>
+        public class Handler : IRequestHandler<Query, Model>
         {
             private readonly SchoolContext _db;
 
             public Handler(SchoolContext db) => _db = db;
 
-            protected override Task<Model> HandleCore(Query message) => 
+            public Task<Model> Handle(Query message, CancellationToken token) => 
                 _db.Courses
                 .Where(i => i.Id == message.Id)
                 .ProjectTo<Model>()

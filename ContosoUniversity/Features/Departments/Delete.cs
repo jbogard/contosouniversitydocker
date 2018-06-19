@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -32,13 +33,13 @@ namespace ContosoUniversity.Features.Departments
             public byte[] RowVersion { get; set; }
         }
 
-        public class QueryHandler : AsyncRequestHandler<Query, Command>
+        public class QueryHandler : IRequestHandler<Query, Command>
         {
             private readonly SchoolContext _db;
 
             public QueryHandler(SchoolContext db) => _db = db;
 
-            protected override async Task<Command> HandleCore(Query message) => await _db
+            public async Task<Command> Handle(Query message, CancellationToken token) => await _db
                 .Departments
                 .Where(d => d.Id == message.Id)
                 .ProjectTo<Command>()
@@ -51,7 +52,7 @@ namespace ContosoUniversity.Features.Departments
 
             public CommandHandler(SchoolContext db) => _db = db;
 
-            protected override async Task HandleCore(Command message)
+            protected override async Task Handle(Command message, CancellationToken token)
             {
                 var department = await _db.Departments.FindAsync(message.Id);
 

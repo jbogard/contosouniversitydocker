@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -41,13 +42,13 @@ namespace ContosoUniversity.Features.Instructors
             public string OfficeAssignmentLocation { get; set; }
         }
 
-        public class QueryHandler : AsyncRequestHandler<Query, Command>
+        public class QueryHandler : IRequestHandler<Query, Command>
         {
             private readonly SchoolContext _db;
 
             public QueryHandler(SchoolContext db) => _db = db;
 
-            protected override Task<Command> HandleCore(Query message) => _db
+            public Task<Command> Handle(Query message, CancellationToken token) => _db
                 .Instructors
                 .Where(i => i.Id == message.Id)
                 .ProjectTo<Command>()
@@ -60,7 +61,7 @@ namespace ContosoUniversity.Features.Instructors
 
             public CommandHandler(SchoolContext db) => _db = db;
 
-            protected override async Task HandleCore(Command message)
+            protected override async Task Handle(Command message, CancellationToken token)
             {
                 Instructor instructor = await _db.Instructors
                     .Include(i => i.OfficeAssignment)

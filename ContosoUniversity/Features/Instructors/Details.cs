@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -40,13 +41,13 @@ namespace ContosoUniversity.Features.Instructors
             public string OfficeAssignmentLocation { get; set; }
         }
 
-        public class Handler : AsyncRequestHandler<Query, Model>
+        public class Handler : IRequestHandler<Query, Model>
         {
             private readonly SchoolContext _db;
 
             public Handler(SchoolContext db) => _db = db;
 
-            protected override Task<Model> HandleCore(Query message) => _db
+            public Task<Model> Handle(Query message, CancellationToken token) => _db
                 .Instructors
                 .Where(i => i.Id == message.Id)
                 .ProjectTo<Model>()

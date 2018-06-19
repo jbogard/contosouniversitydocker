@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using ContosoUniversity.Data;
 using ContosoUniversity.Models;
@@ -17,13 +18,13 @@ namespace ContosoUniversity.Features.Courses
             public Department Department { get; set; }
         }
 
-        public class Handler : AsyncRequestHandler<Command, int>
+        public class Handler : IRequestHandler<Command, int>
         {
             private readonly SchoolContext _db;
 
             public Handler(SchoolContext db) => _db = db;
 
-            protected override async Task<int> HandleCore(Command message)
+            public async Task<int> Handle(Command message, CancellationToken token)
             {
                 var course = Mapper.Map<Command, Course>(message);
                 course.Id = message.Number;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -34,13 +35,13 @@ namespace ContosoUniversity.Features.Students
             }
         }
 
-        public class Handler : AsyncRequestHandler<Query, Model>
+        public class Handler : IRequestHandler<Query, Model>
         {
             private readonly SchoolContext _db;
 
             public Handler(SchoolContext db) => _db = db;
 
-            protected override async Task<Model> HandleCore(Query message) => await _db
+            public async Task<Model> Handle(Query message, CancellationToken token) => await _db
                 .Students
                 .Include(m => m.Enrollments)
                 .ThenInclude(e => e.Course)

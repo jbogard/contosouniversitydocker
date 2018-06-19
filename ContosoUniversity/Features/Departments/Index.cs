@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -29,13 +30,13 @@ namespace ContosoUniversity.Features.Departments
             public string AdministratorFullName { get; set; }
         }
 
-        public class QueryHandler : AsyncRequestHandler<Query, List<Model>>
+        public class QueryHandler : IRequestHandler<Query, List<Model>>
         {
             private readonly SchoolContext _context;
 
             public QueryHandler(SchoolContext context) => _context = context;
 
-            protected override async Task<List<Model>> HandleCore(Query message)
+            public async Task<List<Model>> Handle(Query message, CancellationToken token)
             {
                 var projectTo = _context.Departments
                     .ProjectTo<Model>();

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper.QueryableExtensions;
 using ContosoUniversity.Data;
@@ -28,7 +29,7 @@ namespace ContosoUniversity.Features.Courses
             }
         }
 
-        public class Handler : AsyncRequestHandler<Query, Result>
+        public class Handler : IRequestHandler<Query, Result>
         {
             private readonly SchoolContext _db;
 
@@ -37,7 +38,7 @@ namespace ContosoUniversity.Features.Courses
                 _db = db;
             }
 
-            protected override async Task<Result> HandleCore(Query message)
+            public async Task<Result> Handle(Query message, CancellationToken token)
             {
                 var courses = await _db.Courses
                     .OrderBy(d => d.Id)

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ContosoUniversity.Models;
-using Microsoft.CodeAnalysis.Differencing;
 
 namespace ContosoUniversity.Features.Courses
 {

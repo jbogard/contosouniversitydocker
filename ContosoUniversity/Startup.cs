@@ -13,6 +13,7 @@ using ContosoUniversity.Infrastructure.Tags;
 using FluentValidation.AspNetCore;
 using HtmlTags;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity
@@ -45,6 +46,7 @@ namespace ContosoUniversity
                     opt.ModelBinderProviders.Insert(0, new EntityModelBinderProvider());
                 })
                 .AddFeatureFolders()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); });
         }
 
@@ -54,7 +56,6 @@ namespace ContosoUniversity
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
                 Mapper.AssertConfigurationIsValid();
             }
             else

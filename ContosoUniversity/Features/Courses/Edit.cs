@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -26,13 +27,13 @@ namespace ContosoUniversity.Features.Courses
             }
         }
 
-        public class QueryHandler : AsyncRequestHandler<Query, Command>
+        public class QueryHandler : IRequestHandler<Query, Command>
         {
             private readonly SchoolContext _db;
 
             public QueryHandler(SchoolContext db) => _db = db;
 
-            protected override Task<Command> HandleCore(Query message) =>
+            public Task<Command> Handle(Query message, CancellationToken token) =>
                 _db.Courses
                     .Where(c => c.Id == message.Id)
                     .ProjectTo<Command>()
@@ -63,7 +64,7 @@ namespace ContosoUniversity.Features.Courses
 
             public CommandHandler(SchoolContext db) => _db = db;
 
-            protected override async Task HandleCore(Command message)
+            protected override async Task Handle(Command message, CancellationToken token)
             {
                 var course = await _db.Courses.FindAsync(message.Id);
 
