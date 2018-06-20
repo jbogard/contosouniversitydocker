@@ -2,7 +2,10 @@ version: '3'
 
 services:
   ci:
-    image: microsoft/aspnetcore-build:2.0.5-2.1.4-nanoserver-sac2016
+    image: contosouniversity/ci
+    build:
+      context: .
+      dockerfile: ci\Dockerfile
     volumes:
       - .\:c:\src
     working_dir: \src

@@ -5,19 +5,19 @@
 FROM microsoft/windowsservercore:1709  AS installer-env
 
 # Arguments for installing powershell, must be defined in the container they are used
-ARG PS_VERSION=6.0.1
+ARG PS_VERSION=6.0.2
 
 ENV PS_DOWNLOAD_URL https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 RUN if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) {throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION)}
-RUN Invoke-WebRequest $Env:PS_DOWNLOAD_URL -OutFile powershell.zip
+ADD $PS_DOWNLOAD_URL /powershell.zip
 
 RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
 
 # Install PowerShell into NanoServer
-FROM microsoft/aspnetcore-build:2.0.5-2.1.4-nanoserver-1709
+FROM microsoft/dotnet:2.1-sdk-nanoserver-1709
 
 # Copy Powershell Core from the installer containter
 ENV ProgramFiles C:\Program Files
