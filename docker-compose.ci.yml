@@ -13,7 +13,6 @@ services:
       - "ConnectionStrings:DefaultConnection=Server=test-db;Database=contosouniversity-test;User Id=sa;Password=Pass@word"
     depends_on:
       - test-db
-    entrypoint: powershell
   test-db:
     image: microsoft/mssql-server-windows-developer
     environment:

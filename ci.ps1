@@ -24,4 +24,4 @@ function Exec
 
 exec { & cmd /c docker-compose -f .\docker-compose.ci.yml -p contosouniversitydotnetcore-ci up -d --build --remove-orphans --force-recreate 2`>`&1 }
 
-exec { & cmd /c docker-compose -f ./docker-compose.ci.yml -p contosouniversitydotnetcore-ci run ci .\Build.ps1 }
+exec { & cmd /c docker-compose -f ./docker-compose.ci.yml -p contosouniversitydotnetcore-ci run ci pwsh .\Build.ps1 }

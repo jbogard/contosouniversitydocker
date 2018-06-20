@@ -1,32 +1,42 @@
 # escape=`
 
-# Use server core as an installer container to extract PowerShell,
-# As this is a multi-stage build, this stage will eventually be thrown away
-FROM microsoft/windowsservercore:1709  AS installer-env
+# Installer image
+FROM microsoft/powershell:nanoserver-1709 AS installer-env
 
-# Arguments for installing powershell, must be defined in the container they are used
-ARG PS_VERSION=6.0.2
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ENV PS_DOWNLOAD_URL https://github.com/PowerShell/PowerShell/releases/download/v$PS_VERSION/PowerShell-$PS_VERSION-win-x64.zip
+# Retrieve .NET Core SDK
+ENV DOTNET_SDK_VERSION 2.1.300
 
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+RUN Invoke-WebRequest -OutFile dotnet.zip https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$Env:DOTNET_SDK_VERSION/dotnet-sdk-$Env:DOTNET_SDK_VERSION-win-x64.zip; `
+    $dotnet_sha512 = '4aa6ff6aa51e1d71733944e10fd9e37647a58df7efbc76f432b8c3ffa3f617f9da36f72532175a1e765dbaf4598a14350017342d5f776dfe8e25d5049696d003'; `
+    if ((Get-FileHash dotnet.zip -Algorithm sha512).Hash -ne $dotnet_sha512) { `
+        Write-Host 'CHECKSUM VERIFICATION FAILED!'; `
+        exit 1; `
+    }; `
+    `
+    Expand-Archive dotnet.zip -DestinationPath dotnet; `
+    Remove-Item -Force dotnet.zip
 
-RUN if (!($env:PS_VERSION -match '^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$' )) {throw ('PS_Version ({0}) must match the regex "^\d+\.\d+\.\d+(-\w+(\.\d+)?)?$"' -f $env:PS_VERSION)}
-ADD $PS_DOWNLOAD_URL /powershell.zip
 
-RUN Expand-Archive powershell.zip -DestinationPath \PowerShell
+# SDK image
+FROM microsoft/powershell:nanoserver-1709
 
-# Install PowerShell into NanoServer
-FROM microsoft/dotnet:2.1-sdk-nanoserver-1709
+COPY --from=installer-env ["dotnet", "C:\\Program Files\\dotnet"]
 
-# Copy Powershell Core from the installer containter
-ENV ProgramFiles C:\Program Files
-COPY --from=installer-env ["\\PowerShell\\", "$ProgramFiles\\PowerShell"]
+# In order to set system PATH, ContainerAdministrator must be used
+USER ContainerAdministrator 
+RUN setx /M PATH "%PATH%;C:\Program Files\dotnet"
+USER ContainerUser
 
-# Persist %PSCORE% ENV variable for user convenience
-ENV PSCORE="$ProgramFiles\PowerShell\pwsh.exe"
+# Configure Kestrel web server to bind to port 80 when present
+ENV ASPNETCORE_URLS=http://+:80 `
+    # Enable detection of running in a container
+    DOTNET_RUNNING_IN_CONTAINER=true `
+    # Enable correct mode for dotnet watch (only mode supported in a container)
+    DOTNET_USE_POLLING_FILE_WATCHER=true `
+    # Skip extraction of XML docs - generally not useful within an image/container - helps perfomance
+    NUGET_XMLDOC_MODE=skip
 
-# Set the path
-RUN setx PATH "%PATH%;%ProgramFiles%\PowerShell"
-
-CMD ["pwsh.exe"]
+# Trigger first run experience by running arbitrary cmd to populate local package cache
+RUN dotnet help
