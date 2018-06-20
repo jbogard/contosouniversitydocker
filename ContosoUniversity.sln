@@ -15,7 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ci.ps1 = ci.ps1
 		ci\Dockerfile = ci\Dockerfile
 		LICENSE = LICENSE
+		ci\packagescache.csproj = ci\packagescache.csproj
 		README.md = README.md
+		.kube\vsts.yaml = .kube\vsts.yaml
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4342BA3E-5DA3-4011-BC83-26484BC1A844}"
