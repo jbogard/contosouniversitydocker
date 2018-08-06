@@ -49,7 +49,9 @@
 
             var id = await SendAsync(command);
 
-            var created = await ExecuteDbContextAsync(db => db.Instructors.Where(i => i.Id == id).Include(i => i.CourseAssignments).Include(i => i.OfficeAssignment).SingleOrDefaultAsync());
+            var created = await ExecuteDbContextAsync(
+                async db => await db.Instructors.Where(i => i.Id == id).Include(i => i.CourseAssignments).Include(i => i.OfficeAssignment).SingleOrDefaultAsync()
+                );
 
             created.FirstMidName.ShouldBe(command.FirstMidName);
             created.LastName.ShouldBe(command.LastName);

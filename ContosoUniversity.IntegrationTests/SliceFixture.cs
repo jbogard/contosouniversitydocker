@@ -33,7 +33,13 @@ namespace ContosoUniversity.IntegrationTests
             startup.ConfigureServices(services);
             var provider = services.BuildServiceProvider();
             _scopeFactory = provider.GetService<IServiceScopeFactory>();
-            _checkpoint = new Checkpoint();
+            _checkpoint = new Checkpoint
+            {
+                TablesToIgnore = new[]
+                {
+                    "SchemaVersions"
+                }
+            };
 
             var connString = _configuration.GetConnectionString("DefaultConnection");
 
@@ -41,9 +47,9 @@ namespace ContosoUniversity.IntegrationTests
 
             if (!result.Successful)
             {
-                throw result.Error;
                 var logger = provider.GetRequiredService<ILogger<Program>>();
                 logger.LogError(result.Error, "An error occurred while migrating the database.");
+                throw result.Error;
             }
         }
 
